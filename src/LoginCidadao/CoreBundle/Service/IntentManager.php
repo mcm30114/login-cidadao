@@ -17,6 +17,14 @@ class IntentManager
     const SESSION_INTENT_KEY = 'final.intent';
 
     /**
+     * Routes that should not trigger "Intent consumption"
+     * @var array
+     */
+    private $nonIntentRoutes = [
+        'lc_email_confirmed'
+    ];
+
+    /**
      * @param Request $request
      * @param bool $override
      */
@@ -46,6 +54,10 @@ class IntentManager
      */
     public function consumeIntent(Request $request)
     {
+        if (false !== array_search($request->get('_route'), $this->nonIntentRoutes)) {
+            return null;
+        }
+
         $intent = $this->getIntent($request);
         if ($request->hasSession()) {
             $request->getSession()->remove(self::SESSION_INTENT_KEY);

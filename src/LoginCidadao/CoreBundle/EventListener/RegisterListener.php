@@ -4,10 +4,12 @@ namespace LoginCidadao\CoreBundle\EventListener;
 
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Event\FormEvent;
+use LoginCidadao\CoreBundle\Model\PersonInterface;
 use LoginCidadao\CoreBundle\Service\RegisterRequestedScope;
 use LoginCidadao\OAuthBundle\Entity\ClientRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use FOS\UserBundle\Util\TokenGeneratorInterface;
 use FOS\UserBundle\Mailer\MailerInterface;
@@ -23,7 +25,7 @@ class RegisterListener implements EventSubscriberInterface
 {
     private $router;
 
-    /** \Symfony\Component\HttpFoundation\Session\Session * */
+    /** @var Session */
     private $session;
 
     /** @var TranslatorInterface */
@@ -50,7 +52,7 @@ class RegisterListener implements EventSubscriberInterface
 
     public function __construct(
         UrlGeneratorInterface $router,
-        SessionInterface $session,
+        Session $session,
         TranslatorInterface $translator,
         MailerInterface $mailer,
         TokenGeneratorInterface $tokenGenerator,
@@ -132,22 +134,18 @@ class RegisterListener implements EventSubscriberInterface
 
     public function onEmailConfirmed(GetResponseUserEvent $event)
     {
-        $event->getUser()->setEmailConfirmedAt(new \DateTime());
-        $event->getUser()->setEmailExpiration(null);
+        /** @var PersonInterface $person */
+        $person = $event->getUser();
+        if (!($person instanceof PersonInterface)) {
+            return;
+        }
 
-        $this->session->getFlashBag()->add(
-            'success',
-            $this->translator->trans(
-                'registration.confirmed',
-                array(
-                    '%username%' => $event->getUser()->getFirstName(),
-                ),
-                'FOSUserBundle'
-            )
-        );
+        $person->setEmailConfirmedAt(new \DateTime());
+        $person->setEmailExpiration(null);
+
         $this->session->getFlashBag()->get('alert.unconfirmed.email');
 
-        $url = $this->router->generate('fos_user_profile_edit');
+        $url = $this->router->generate('lc_email_confirmed');
         $event->setResponse(new RedirectResponse($url));
     }
 
