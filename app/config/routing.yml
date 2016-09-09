@@ -149,7 +149,7 @@ lc_privacy:
         template:    'LoginCidadaoCoreBundle:Info:privacy.html.twig'
 
 lc_email_confirmed:
-    path: /email-confirmed
+    path: /email-verified
     defaults:
         _controller: FrameworkBundle:Template:template
         template:    'LoginCidadaoCoreBundle:Info:email_confirmed.html.twig'
