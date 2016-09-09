@@ -1,1 +1,12 @@
-email confirmed!
+{% extends 'LoginCidadaoCoreBundle::compact.base.html.twig' %}
+
+{% block notificationExtreme %}
+{% endblock %}
+
+{% block panel_body %}
+    <h1>{{ 'email_confirmed.title' | trans }}</h1>
+
+    <p>{{ 'email_confirmed.body' | trans }}</p>
+
+    <a href="{{ path('lc_home') }}" class="btn btn-block btn-success">{{ 'email_confirmed.button.dashboard' | trans }}</a>
+{% endblock %}

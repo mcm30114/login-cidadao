@@ -459,3 +459,7 @@ dynamic_form:
                     submit:
                         label: If your email is mistyped, correct it and click the following button.
                         button: Change Email
+email_confirmed:
+    title: Email verified successfully
+    body: Thanks for verifying your email.
+    button.dashboard: Go to the dashboard
