@@ -31,4 +31,18 @@ class ClientMetadataRepository extends EntityRepository
 
         return $response;
     }
+
+    /**
+     * @param $clientId
+     * @return ClientMetadata|null
+     */
+    public function findByClientId($clientId)
+    {
+        return $this->createQueryBuilder('m')
+            ->join('m.client', 'c')
+            ->where('c.id = :id')
+            ->setParameter('id', $clientId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
