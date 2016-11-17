@@ -54,6 +54,7 @@ class DumpSubsCommand extends ContainerAwareCommand
         $metadata = $metadataRepo->findByClientId($clientId);
         if (!$metadata) {
             $io->error("Client '$clientId' metadata was not found!");
+
             return;
         }
         $metadata->setSubjectType('pairwise');
@@ -62,7 +63,7 @@ class DumpSubsCommand extends ContainerAwareCommand
 
         /** @var PersonRepository $personRepo */
         $personRepo = $em->getRepository('LoginCidadaoCoreBundle:Person');
-        $query = $personRepo->getFindAuthorizedByClientIdQuery($clientId)->getQuery();
+        $query = $personRepo->getFindAuthorizedByClientIdQuery($clientId)->select('p.id, p.cpf')->getQuery();
         $results = $query->iterate();
 
         $io->section('Iterating authorized people...');
@@ -72,8 +73,9 @@ class DumpSubsCommand extends ContainerAwareCommand
         }
         $count = 0;
         while (false !== ($row = $results->next())) {
+            $row = reset($row);
             /** @var Person $person */
-            $person = $row[0];
+            $person = $this->getPerson($row['id'], $row['cpf']);
             $sub = $subService->getSubjectIdentifier($person, $metadata);
             $data = ['cpf' => $person->getCpf(), 'pairwise' => $sub, 'public' => $person->getId()];
 
@@ -82,7 +84,6 @@ class DumpSubsCommand extends ContainerAwareCommand
             } else {
                 $result[] = $data;
             }
-            $em->detach($person);
             $count++;
         }
         if (isset($handle)) {
@@ -102,5 +103,24 @@ class DumpSubsCommand extends ContainerAwareCommand
     private function getManager()
     {
         return $this->getContainer()->get('doctrine')->getManager();
+    }
+
+    /**
+     * @param $id
+     * @param $cpf
+     * @return Person
+     */
+    private function getPerson($id, $cpf)
+    {
+        $person = new Person();
+        $person->setCpf($cpf);
+
+        $reflection = new \ReflectionClass('LoginCidadao\CoreBundle\Entity\Person');
+        $reflectionProp = $reflection->getProperty('id');
+        $reflectionProp->setAccessible(true);
+        $reflectionProp->setValue($person, $id);
+        $reflectionProp->setAccessible(false);
+
+        return $person;
     }
 }
