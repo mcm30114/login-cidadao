@@ -1,4 +1,0 @@
-procergs_login_cidadao_accounting:
-    resource: "@PROCERGSLoginCidadaoAccountingBundle/Controller/"
-    type: annotation
-    prefix: /

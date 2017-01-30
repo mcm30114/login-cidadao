@@ -1,3 +1,0 @@
-procergs_nfg_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: PROCERGSNfgBundle:Default:index }

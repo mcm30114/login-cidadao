@@ -39,8 +39,3 @@ services:
         calls:
             - [setMemcache, ["@memcached"]]
             - [setNamespace, ['%memcached_prefix%']]
-
-    circuitBreakerCacheBackend:
-        class: Doctrine\Common\Cache\MemcacheCache
-        calls:
-          -   [setMemcache, ["@memcached"]]
